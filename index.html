@@ -379,7 +379,6 @@
 									.data(colorGender)
 									.enter()
 									.append("g")
-									.attr("transform", "translate(" + widthGender / 2 + "," + heightGender / 2 + ")")
 									.attr("class", "legend")
 									.attr("transform", function(d,i){
 										var height = legendRectSize + legendSpacing;
@@ -403,6 +402,8 @@
 									if(d == "#1bbdfe"){return "Male"}
 									if(d == "#ff99d4"){return "Female"}
 									});
+								
+								
 
 						d3.select("#tooltip").classed("hidden", false);
 						
