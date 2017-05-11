@@ -353,12 +353,12 @@
 	
 								var groupGender = genderDonut.append("g");
 						
-								groupGender.attr("transform", "translate(" + widthGender / 2 + "," + heightGender / 2 + ")");
 																			
 								var arcs = groupGender.selectAll(".arc")
 									.data(pie(dataDonut)) 
 									.enter()
 									.append("g")
+									.attr("transform", "translate(" + widthGender / 2 + "," + heightGender / 2 + ")")
 									.attr("class", "arc");
 							
 								arcs.append("path")
