@@ -383,8 +383,8 @@
 									.attr("transform", function(d,i){
 										var height = legendRectSize + legendSpacing;
 										var offset = height * colorGender.length /2;
-										var horz = 115 - (3 * legendRectSize);
-										var vert = 115 + (i *height - offset);
+										var horz =  heightGender / 2 - (3 * legendRectSize);
+										var vert = widthGender / 2 + (i *height - offset);
 										return "translate(" + horz + "," + vert + ")";										
 									} );
 									
