@@ -379,6 +379,7 @@
 									.data(colorGender)
 									.enter()
 									.append("g")
+									.attr("transform", "translate(" + widthGender / 2 + "," + heightGender / 2 + ")")
 									.attr("class", "legend")
 									.attr("transform", function(d,i){
 										var height = legendRectSize + legendSpacing;
