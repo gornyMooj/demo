@@ -1,0 +1,507 @@
+<!doctype html>
+
+<meta charset="utf-8">
+
+<html>
+	
+	
+	<head>
+	
+		<title> 
+			Population Co.Kildare
+		</title>
+		
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="http://d3js.org/topojson.v1.min.js"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		
+		<style>
+		
+			body{
+				color:#4d4d4d;
+				
+			}
+			svg {
+				font: 10px sans-serif;
+				display: inline;
+				
+			}
+			
+			#chartPop path {
+				fill: none;
+				stroke: #404040;
+				shape-rendering: crispEdges;
+			}
+			
+			.key path {
+				display: none;
+			}
+
+			.key line {
+				stroke: #000;
+				shape-rendering: crispEdges;
+			}
+
+			.key text {
+				font-size: 10px;
+			}
+
+			
+			#chartPop{
+				background-color: #ffe5e5;
+			}
+			
+			.radio{
+				text-align: center;
+			}
+			
+			.row{
+				text-align: center;
+			}
+
+			#tooltip {
+				background-color: #ffece5;
+				position: absolute;
+				width: auto;
+				height: auto;
+				padding: 10px;
+				-webkit-border-radius: 10px;
+				-moz-border-radius: 10px;
+				border-radius: 10px;
+				-webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				-moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				pointer-events: none;
+			}
+			
+			#tooltip.hidden {
+				display: none;
+			}
+			
+			#tooltip p {
+				margin: 0;
+				font-family: sans-serif;
+				font-size: 16px;
+				line-height: 20px;
+			}
+			
+			#container path:hover {
+				fill:#e6b319;
+			}
+			
+			#container{
+				background-color: #ffe5e5;
+
+			}
+			
+			.row{
+				background-color: #ffece5;
+				outline: 1px solid pink;
+			}
+			
+			
+		</style>
+		
+	</head>
+	<body>
+	
+	<div class = "mainContainer">	
+		<div class='row'>
+				<h3>Census Year (County Kildare)</h3>
+					<form class='radio'  autocomplete="off">
+						<label class='radio-inline'>
+							<input type="radio" name="gender"  value="densit1996" onclick='updateMap(this.value)' checked> 1996
+						</label>
+						<label class='radio-inline'>
+							<input type="radio" name="gender" value="densit2002" onclick='updateMap(this.value)'> 2002
+						</label>
+						<label class='radio-inline'>
+							<input type="radio" name="gender" value="densit2006" onclick='updateMap(this.value)'  > 2006
+						</label>
+						<label class='radio-inline'>
+							<input type="radio" name="gender" value="densit2011" onclick='updateMap(this.value)'> 2011
+						</label>
+						<label class='radio-inline'>
+							<input type="radio" name="gender" value="densit2016" onclick='updateMap(this.value)'> 2016
+						</label>
+					</form>
+		</div>		
+		<div id="container">
+			<div id="tooltip" class="hidden">
+				<p><strong>Total Population:</strong></p>
+				<p><span id="value"></span></p>
+			</div>				
+		</div>		
+		<div id = "chartPop"></div>
+		
+	<script>
+		var height = 400,
+			width = 600;
+			
+		var mapa = d3.select("#container")
+			.append("svg")
+			.attr("height", height)
+			.attr("width", width);
+			
+		var projection = d3.geo.albers()
+			.center([-2.0, 53]) 					
+			.rotate([4.4, 0])
+			.parallels([50, 60])
+			.scale(35000) 		
+			.translate([width / 2, height / 2]); 
+			
+		var path = d3.geo.path()
+			.projection(projection);
+
+		var color = d3.scale.threshold()
+			.domain([23, 38, 65, 144, 277, 772, 1279,2850])
+			.range(["#fff5eb","#fee6ce","#fdd0a2","#fdae6b","#fd8d3c","#f16913","#d94801","#8c2d04"]);
+		
+		
+		var y = d3.scale.sqrt()
+			.domain([ 0, d3.max(color.domain()) ])
+			.range([0,325]);
+		
+		
+		var yAxis = d3.svg.axis()
+			.scale(y)
+			.tickValues(color.domain()) 
+			.orient("right");
+			
+		var g = mapa.append("g")
+			.attr("class","key")
+			.attr("transform", "translate(350,50)")
+			.call(yAxis);
+		
+		g.selectAll("rect")
+			.data(color.range().map( function (d,i){ 
+				return{ 
+					y0: i ? y(color.domain()[i - 1]) : y.range()[0], 
+					y1: i <color.domain().length ? y(color.domain()[i]) : y.range()[1],
+					z:d
+				};
+			}))
+			.enter().append("rect")
+				.attr("width", 8)
+				.attr("y", function (d){return d.y0;})
+				.attr("height", function(d){ return d.y1 - d.y0;})
+				.style("fill", function (d){ return d.z;});
+				
+			d3.select(".key")
+				.selectAll("text")
+				.style("fill", "#4d4d4d");
+			
+			var marginChart = {top:20, right:20, bottom:40, left:120};
+			
+			var heightChart = 600 - marginChart.top - marginChart.bottom,
+				widthChart = 600 - marginChart.left - marginChart.right;
+			
+			var chartPop = d3.select("#chartPop")
+				.append("svg")
+				.attr("width", widthChart + marginChart.left + marginChart.right)
+				.attr("height", heightChart + marginChart.top + marginChart.bottom)
+				.append("g")
+				.attr("transform", "translate(" + marginChart.left + "," + marginChart.top + ")" );
+				
+			var yChart = d3.scale.ordinal() 				
+						.rangeRoundBands([0, heightChart], .1);
+					
+			var xChart = d3.scale.linear()
+						.range([0, widthChart]);
+												
+			var yAxisChart = d3.svg.axis()
+				.scale(yChart)
+				.orient("left");
+						
+			var xAxisChart = d3.svg.axis()
+				.scale(xChart)
+				.orient("bottom")
+				.ticks(10);
+				
+		function updateMap(censusYear){ 
+		
+			d3.csv("census.csv",function(error,census){
+				
+				var dataOfChosenCensusDensity = {}; 
+				var dataTotalPop = {}; 							
+				var dataPopulationTotal = [];		
+				var femalePop = {};					
+				var malePop = {};					
+				
+				if (censusYear == "densit1996"){	
+					censusYear = "1996";					
+					census.forEach(function(d){
+						dataOfChosenCensusDensity[d.EDNAME] = + d.Densit1996;						
+						femalePop[d.EDNAME] = + d.Fem1996;
+						malePop[d.EDNAME] = + d.Mal1996;						
+						dataTotalPop[d.EDNAME] = + d.Pop1996;
+						dataPopulationTotal.push({
+							edname : d.EDNAME,
+							population : d.Pop1996
+						})							
+					});					       
+				}	
+				if (censusYear == "densit2002"){				
+					censusYear = "2002";				
+					census.forEach(function(d){
+						dataOfChosenCensusDensity[d.EDNAME] = + d.Dnesit2002;						
+						femalePop[d.EDNAME] = + d.Fem2002;
+						malePop[d.EDNAME] = + d.Mal2002;						
+						dataTotalPop[d.EDNAME] = + d.Pop2002;
+						dataPopulationTotal.push({
+							edname : d.EDNAME,
+							population : d.Pop2002
+						})					
+					});
+				}
+				if (censusYear == "densit2006"){				
+					censusYear = "2006";					
+					census.forEach(function(d){
+						dataOfChosenCensusDensity[d.EDNAME] = + d.Densit2006;						
+						femalePop[d.EDNAME] = + d.Fem2006;
+						malePop[d.EDNAME] = + d.Mal2006;						
+						dataTotalPop[d.EDNAME] = + d.Pop2006;
+						dataPopulationTotal.push({
+							edname : d.EDNAME,
+							population : d.Pop2006
+						})						
+					});
+				}
+				if (censusYear == "densit2011"){				
+					censusYear = "2011";					
+					census.forEach(function(d){
+						dataOfChosenCensusDensity[d.EDNAME] = + d.Densit2011;
+						dataTotalPop[d.EDNAME] = + d.Pop2011;						
+						femalePop[d.EDNAME] = + d.Fem2011;
+						malePop[d.EDNAME] = + d.Mal2011;						
+						dataPopulationTotal.push({
+							edname : d.EDNAME,
+							population : d.Pop2011
+						})
+						
+					});
+				}
+				if (censusYear == "densit2016"){				
+					censusYear = "2016";					
+					census.forEach(function(d){
+						dataOfChosenCensusDensity[d.EDNAME] = + d.Densit2016;
+						dataTotalPop[d.EDNAME] = + d.Pop2016;						
+						femalePop[d.EDNAME] = + d.Fem2016;
+						malePop[d.EDNAME] = + d.Mal2016;						
+						dataPopulationTotal.push({
+							edname : d.EDNAME,
+							population : d.Pop2016
+						})						
+					});
+				}
+
+				d3.json("kildare_2016.json", function(error, kildare_2016){					
+					mapa.selectAll(".subunit") 
+						.data(topojson.feature(kildare_2016, kildare_2016.objects.units).features) 
+						.enter().append("path")
+						.attr("class", function(d) { return d.id; }) 
+						.attr("d", path)
+						.attr("transform","translate(0,100)")
+						.style("stroke", "#666666")                           
+						.style("stroke-dasharray", "2,2")
+						.attr("fill", function(d){ return color( dataOfChosenCensusDensity[d.id])});
+					
+					mapa.selectAll("path")
+						.on('mouseover', function(d) { 
+						var xPosition = 400;  
+						var yPosition = 135;					
+						var selectedName = d.id;
+						var male = malePop[d.id],
+							female = femalePop[d.id];
+					
+						d3.select("#tooltip")
+							.style("left", xPosition + "px")
+							.style("top", yPosition + "px")						
+							.select("#value")
+							.html("<b>" + "Name: " + "</b>" + d.id +"<br>" + "<b>" + "Density POP: " + "</b>" + dataOfChosenCensusDensity[d.id] + "[p/skm]" +"<br>" + "<b>" + "Total POP: " + "</b>" + parseInt(male + female));
+												
+							d3.select("#tooltip")
+									.selectAll(".genderDonut")
+									.remove();
+									
+								
+								var dataDonut = [male,female]
+								
+								var widthGender = 230,
+									heightGender = 230,
+									radius = (heightGender)/2;		
+								
+								var legendRectSize= radius * 0.1;
+								var legendSpacing = radius * 0.05;
+								
+								var colorGender =["#1bbdfe","#ff99d4"]
+																
+								var arc = d3.svg.arc()
+									.outerRadius(radius - 20)
+									.innerRadius(radius - 60);
+									
+								var pie = d3.layout.pie()
+									.value(function(d) {return d;})
+									.sort(null); 
+									
+								var genderDonut = d3.select("#tooltip")
+									.append("svg")
+									.attr("class", "genderDonut")
+									.attr("width",widthGender)
+									.attr("height", heightGender)
+									.attr("transform", "translate(" + widthGender / 2 + "," + heightGender / 2 + ")");
+	
+								var groupGender = genderDonut.append("g")
+																			
+								var arcs = groupGender.selectAll(".arc")
+									.data(pie(dataDonut)) 
+									.enter()
+									.append("g")
+									.attr("class", "arc");
+							
+								arcs.append("path")
+									.attr("d", arc)
+									.style("fill", function(d,i){return colorGender[i]})
+									.style("stroke", "#ffece5");
+									
+								arcs.append("text")
+									.attr("transform", function(d){ return "translate(" + arc.centroid(d) + ")";})
+									.attr("text-anchor", "middle")
+									.attr('font-size', '1.5em')
+									.style("text-shadow", "1px 1px #ffece5")
+									.style("fill", "#4d4d4d")
+									.style("font-weight", "bold")
+									.text(function(d) {return d.data;});
+									
+								var legend = genderDonut.selectAll(".legend")
+									.data(colorGender)
+									.enter()
+									.append("g")
+									.attr("class", "legend")
+									.attr("transform", function(d,i){
+										var height = legendRectSize + legendSpacing;
+										var offset = height * colorGender.length /2;
+										var horz = -3 * legendRectSize;
+										var vert = i *height - offset;
+										return "translate(" + horz + "," + vert + ")";										
+									} );
+									
+								legend.append("rect")
+									.attr("width", legendRectSize)
+									.attr("height", legendRectSize)
+									.style("fill", function(d,i){return colorGender[i]})
+									.style("stroke", function(d,i){return colorGender[i]});
+									
+								legend.append("text")
+									.attr("x", legendRectSize + legendSpacing)
+									.attr("y", legendRectSize - legendSpacing)
+									.style("fill", "#4d4d4d")
+									.text(function(d){ 
+									if(d == "#1bbdfe"){return "Male"}
+									if(d == "#ff99d4"){return "Female"}
+									});
+
+						d3.select("#tooltip").classed("hidden", false);
+						
+						hooverBar(selectedName);				
+					})
+				
+					.on("mouseout", function(){
+						d3.select("#tooltip").classed("hidden", true);
+					});
+				xChart.domain([ 0,22000]);
+				
+				yChart.domain(census.map( function(d){
+						return d.EDNAME
+					}));
+				
+				
+				d3.select("#chartPop")
+					.selectAll(".yChartPopAxis")
+					.remove();
+						
+				d3.select("#chartPop")
+					.selectAll(".xChartPopAxis")
+					.remove();
+				
+				chartPop.append("g")
+						.attr("class", "xChartPopAxis")
+						.attr("transform", "translate(0," + heightChart + ")")
+						.call(xAxisChart)
+						.selectAll("text")
+						.style("text-anchor", "start")
+						.attr("dx", "0.6em")
+						.attr("dy", "-.55em")
+						.style("fill", "#4d4d4d")
+						.attr("transform", "rotate(90)" )
+						.append("text")
+						.attr("transform", "rotate(0)")
+						.attr("y", 10) // co to ????
+						.attr("dy", "2em")
+						.style("text-anchor", "start")
+						.style("font-size", "110%")
+						.style("font-weight","bold")
+						.text("Total Population: " + censusYear);
+					
+						// drowing Y Axis
+					chartPop.append("g")
+						.attr("class", "yChartPopAxis")
+						.call(yAxisChart)
+						.style("fill", "#4d4d4d")
+						.style("font-size",".9em");
+
+					
+					d3.select("#chartPop")
+						.selectAll(".barPop")
+						.remove();
+						
+					
+					var barsPop = chartPop.selectAll(".bar")
+						.data(dataPopulationTotal)
+						.enter()
+						.append("rect")
+						.attr("class", "barPop");
+						
+					barsPop.attr("y", function(d){
+							return yChart(d.edname);
+						})
+						.attr("height", yChart.rangeBand())
+						.attr("x", 0)
+						.attr("width", function(d){
+								return xChart(d.population);
+					});
+					
+					barsPop.append("title")
+						.text(function(d) {
+							return d.edname + " Total Pop " + d.population;
+					});
+						
+					barsPop.attr("fill","#4d4d4d");
+					
+					console.log(dataPopulationTotal);
+					
+					function hooverBar(selectedName){ 
+
+						console.log(selectedName)
+						
+						chartPop.selectAll("rect")
+							.style("fill", function(d){
+								if(d.edname == selectedName){return "#e6b319"}
+							})
+					};										
+				});
+		
+			});
+		};
+		
+		updateMap("densit1996");
+		
+		function check() {
+			document.getElementById("start1996").checked = true;
+		};
+	
+	</script>
+
+	
+	</body>
+</html>
