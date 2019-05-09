@@ -15,3 +15,11 @@ Tabular data was downloaded in the CSV format from the CSO database for each cen
 **Spatial Data**<br/>
 The spetial data was dowloaded in the [shapefile](https://en.wikipedia.org/wiki/Shapefile) format from the CSO website and proccessed in QGIS to extract the boundaries only for EDs located in Co. Kildare. Then the shapefile data was converted into the [TopoJSON](https://github.com/topojson/topojson) format using [Geospatial Data Abstraction Library(GDAL)](https://www.gdal.org/). The TopoJson was used because this format reduces file size, it is substantially more compact than GeoJSON, frequently offering a reduction of 80% or more even without simplification.
 
+**Tools used:**<br/>
+- D3.js V3
+- Bootstrap 3
+- QGIS
+- GDAL: ogr2ogr
+- Python 2.7
+- TopoJSON
+- CSV
