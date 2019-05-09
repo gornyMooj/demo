@@ -7,7 +7,7 @@ This short demo shows usage of D3.js in visualization of the change of the popul
 - 2011
 - 2016
 
-The data is displayed in the form of the choropleth map representing the number of people living in a given electoral division ([ED](https://en.wikipedia.org/wiki/Electoral_division_(Ireland)) - *the smallest legally defined administrative areas in Ireland for which small area population statistics*). The same population is displayed on a chart. Both elements are linked together when an ED is being highlighted on the map its equivalent changes color on the chart.
+The data is displayed in the form of the choropleth map representing the number of people living in a given electoral division ([ED](https://en.wikipedia.org/wiki/Electoral_division_(Ireland)) - *the smallest legally defined administrative areas in Ireland for which small area population statistics*). 
 
 Tabular data 
 
