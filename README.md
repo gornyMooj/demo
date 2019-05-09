@@ -1,6 +1,6 @@
 # Census Co. Kildare - [demo](https://gornymooj.github.io/demo/)
 
-This short demo shows usage of D3.js in visualization of the change of the population in Co. Kildare. The statistic data was taken from the official website of [Central Statistics Office(CSO)] (http://census.ie/), years:
+This short demo shows usage of D3.js in visualization of the change of the population in Co. Kildare. The statistic data was taken from the official website of [Central Statistics Office(CSO)](http://census.ie/), years:
 - 1996
 - 2002
 - 2006
